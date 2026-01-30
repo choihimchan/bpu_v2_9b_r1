@@ -1,46 +1,27 @@
-# BPU v2.9b-r1 — Data Stability Under Pressure (Flow Diagram)
-
-This diagram illustrates the high-level runtime flow of  
-**BPU (Batch Processing Unit)** and how it maintains output stability
-under **TX backpressure** and **budget pressure**.
-
----
-
-## Diagram intent
-
-This diagram explains how BPU:
-
-- Explicitly models backpressure paths
-- Applies budget-based degradation
-- Preserves high-priority data
-- Makes all scheduling decisions observable via runtime counters
-
-It represents **runtime behavior**, not static architecture.
-
----
+# BPU – Data Stability Under Pressure (Diagram)
 
 ## High-level flow
 
 ```mermaid
 flowchart LR
     P[Producers]
-    IN[Event Ingress & Coalescing]
-    Q[Job Queues<br/>(by type / priority)]
-    S[Scheduler Tick]
-    TX[TX Flush Attempt]
-    OUT[UART Frames Out]
-    BACK[TX Backpressure]
-    DROP[Degrade / Drop<br/>Low Priority Jobs]
-    STATS[Runtime Statistics]
+    IN[Ingress_Coalesce]
+    Q[Queues_by_type_priority]
+    S[Scheduler_Tick]
+    TX[TX_Flush]
+    OUT[UART_Frames_Out]
+    BACK[Backpressure]
+    DROP[Drop_or_Degrade_low_priority]
+    STATS[Runtime_Stats]
 
     P --> IN
     IN --> Q
     Q --> S
 
-    S -->|budget ok| TX
-    S -->|budget tight| DROP
+    S -->|budget_ok| TX
+    S -->|budget_tight| DROP
 
-    TX -->|TX blocked| BACK
+    TX -->|blocked| BACK
     BACK --> Q
 
     TX --> OUT
@@ -48,7 +29,6 @@ flowchart LR
     S --> STATS
     DROP --> STATS
     BACK --> STATS
-
 
 ```
 ## How to read this diagram
