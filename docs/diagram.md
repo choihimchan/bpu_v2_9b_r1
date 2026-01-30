@@ -1,4 +1,23 @@
-# BPU – Data Stability Under Pressure (Diagram)
+# BPU v2.9b-r1 — Data Stability Under Pressure (Flow Diagram)
+
+This diagram illustrates the high-level runtime flow of  
+**BPU (Batch Processing Unit)** and how it maintains output stability
+under **TX backpressure** and **budget pressure**.
+
+---
+
+## Diagram intent
+
+This diagram explains how BPU:
+
+- Explicitly models backpressure paths
+- Applies budget-based degradation
+- Preserves high-priority data
+- Makes all scheduling decisions observable via runtime counters
+
+It represents **runtime behavior**, not static architecture.
+
+---
 
 ## High-level flow
 
