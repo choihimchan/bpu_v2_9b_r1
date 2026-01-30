@@ -57,17 +57,13 @@ flowchart LR
 - Drops and backpressure are **explicitly counted**
 - Recovery paths rejoin the main queue flow
 
-This diagram matches:
-- counters in `stats.md`
-- scenarios in `log_samples.md`
+Cross-reference
 
-- ## Diagram intent
+This diagram directly corresponds to:
 
-This diagram illustrates how BPU maintains data stability
-under TX backpressure and budget pressure by:
+Runtime counters described in docs/stats.md
 
-- Explicitly modeling backpressure paths
-- Applying budget-based degradation
-- Preserving high-priority data
-- Making all decisions observable via runtime counters
+Observed execution scenarios in docs/log_samples.md
+
+Together, these documents describe a single validated runtime model.
 
