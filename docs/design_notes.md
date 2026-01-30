@@ -1,18 +1,18 @@
-# BPU Design Notes
+# BPU v2.9b-r1 — Design Notes
 
 This document describes the design philosophy and internal structure of  
 **BPU (Batch Processing Unit)** — a small embedded scheduling engine focused on
 **output stability under pressure**, not raw throughput.
 
 BPU was designed and validated on ESP32 (Arduino environment), but the concepts
-are hardware-agnostic.
+are hardware-agnostic and apply to constrained output pipelines in general.
 
 ---
 
 ## 1. Problem Statement
 
-In embedded systems, especially those involving UART / BLE / SPI outputs,
-the system frequently encounters **output pressure**:
+In embedded systems—especially those involving UART, BLE, or SPI outputs—the
+system frequently encounters **output pressure**:
 
 - TX buffers temporarily unavailable
 - Limited bytes-per-tick budget
@@ -37,13 +37,13 @@ of all data.
 Losing *low-priority telemetry* is acceptable.  
 Blocking the system is not.
 
-This principle drives all scheduling decisions.
+This principle drives all scheduling decisions and degradation behavior.
 
 ---
 
 ### 2.2 Separation of Events and Jobs
 
-BPU separates input into two layers:
+BPU separates input into two conceptual layers:
 
 - **Events**  
   Lightweight signals representing *state changes* or *intent*.
@@ -55,9 +55,9 @@ Why this matters:
 
 - Events can be **coalesced**
 - Jobs represent **actual cost** (bytes, time)
-- Scheduling decisions happen at the job level, not event level
+- Scheduling decisions happen at the job level, not the event level
 
-This avoids redundant work and allows precise pressure control.
+This separation avoids redundant work and enables precise pressure control.
 
 ---
 
@@ -92,7 +92,7 @@ Each tick:
 - Remaining jobs are deferred
 
 This guarantees:
-- Deterministic upper bound on output cost
+- A deterministic upper bound on output cost per tick
 - No single tick monopolizes the system
 
 ---
@@ -108,7 +108,7 @@ Once TX resumes:
 - Queued jobs flush automatically
 - Recovery is observable via runtime statistics
 
-This behavior is validated in runtime logs.
+This behavior is validated using real execution logs.
 
 ---
 
@@ -125,16 +125,24 @@ This avoids:
 - Producer blocking
 - Undefined behavior
 
-Degradation is a **first-class feature**, not a failure.
+Degradation is a **first-class feature**, not a failure mode.
 
 ---
 
 ## 6. Observability and Validation
 
-BPU exposes extensive runtime statistics:
+BPU exposes explicit runtime statistics to make pressure behavior observable:
+
 - Event in/out/merge/drop
 - Job in/out/requeue/drop
 - TX skip counters
 - Budget exhaustion indicators
 
-Real execution logs and interpretations are provided in:
+Real execution logs and detailed interpretations are provided in:
+- `docs/log_samples.md`
+- `docs/stats.md`
+
+These logs demonstrate:
+- Backpressure handling
+- Budget exhaustion
+- Graceful degradation and recovery
