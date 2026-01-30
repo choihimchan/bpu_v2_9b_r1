@@ -1,17 +1,19 @@
 > **BPU (Batch Processing Unit)** is a small embedded scheduling core designed to
-> keep outgoing data stable under pressure.
+> keep **outgoing data pipelines** stable under pressure.
 >
 > It focuses on **runtime behavior**, not API completeness:
 > backpressure handling, budget-based degradation, and observable recovery.
 
 
 # BPU v2.9b-r1 — Dual UART Demo (ESP32)
+
 ## Documentation
 - [Design notes](docs/design_notes.md) — core scheduler, backpressure, degradation strategy
-- [Runtime log samples](docs/log_samples.md) — real ESP32 logs with interpretation
-- [Runtime statistics](docs/stats.md) — observability counters and pressure signals
 - [Data stability flow diagram](docs/diagram.md) — high-level data flow under pressure
+- [Runtime statistics](docs/stats.md) — observability counters and pressure signals
+- [Runtime log samples](docs/log_samples.md) — real ESP32 logs with interpretation
 
+> Recommended order: Design notes → Diagram → Stats → Log samples
 
 
 BPU is a small embedded scheduling core that keeps outgoing data stable under:
@@ -22,18 +24,25 @@ This repository includes a **dual-UART demo**:
 - `Serial` (USB, 115200): human-readable logs
 - `Serial1` (UART, 921600): binary frames (COBS + CRC16)
 
-- Runtime behavior is observable via explicit counters (`stats.md`) and validated with real logs.
+Runtime behavior is observable via explicit counters (`docs/stats.md`)
+and validated with real execution logs.
 
+---
 
-## What this demo proves
-- When budget is insufficient → jobs are requeued, low-priority jobs may drop (TELEM), stats show `skipB`, `degrade_*`.
-- When TX is blocked → jobs requeue, stats show `skipTX`, queue growth and recovery.
-- Coalescing keeps only the newest of certain event types.
+## What this demo proves (runtime behavior)
+
+- When budget is insufficient → jobs are requeued, low-priority jobs may drop (TELEM); stats expose `skipB`, `degrade_*`.
+- When TX is blocked → jobs requeue; stats expose `skipTX`, queue growth, and recovery.
+- Coalescing keeps only the newest instance of certain event types.
+
+---
 
 ## Hardware
 ESP32-WROOM
 - Serial1 TX: GPIO17
 - Serial1 RX: GPIO16 (unused)
+
+---
 
 ## When to use BPU
 
@@ -49,6 +58,8 @@ Typical targets:
 - Dual-UART or UART + BLE systems
 - Sensor aggregation under bandwidth limits
 
+---
+
 ## What BPU is NOT
 
 - Not a general-purpose RTOS scheduler
@@ -56,26 +67,30 @@ Typical targets:
 - Not a finalized public API
 
 This repository represents a **validated engine snapshot**
-focused on behavior under pressure.
+focused specifically on observable behavior under pressure.
+
+---
 
 ## How to validate this demo
 
 1. Build and upload the firmware to ESP32-WROOM
-2. Open USB Serial Monitor at 115200 baud
+2. Open USB Serial Monitor at **115200 baud**
 3. Observe runtime logs during:
    - normal operation
    - UART TX blocking
    - budget pressure (high event rate)
-4. Compare observed logs with:
+4. Compare observed behavior with:
    - `docs/log_samples.md`
    - `docs/stats.md`
    - `docs/diagram.md`
 
+---
 
 ## Build & Run
+
 1. Open the `.ino` in Arduino IDE
 2. Select **ESP32 Dev Module** (or your target WROOM board)
-3. Upload and open Serial Monitor at **115200**
+3. Upload and open Serial Monitor at **115200 baud**
 
 ## Frame format (OUT)
 `0x00` delimiter + `COBS( [0xB2, type, seq, len, payload..., crc16] )`
