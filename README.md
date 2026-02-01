@@ -1,14 +1,12 @@
 > **BPU (Batch Processing Unit)** is a small embedded scheduling core designed to
 > keep **outgoing data pipelines** stable under pressure.
-
->
->BPU2 (next): evolving into a lightweight embedded streaming engine (ESP-IDF)
->
 > 
 > It focuses on **runtime behavior**, not API completeness:
 > backpressure handling, budget-based degradation, and observable recovery.
 
-
+>BPU2 (next): evolving into a lightweight embedded streaming engine (ESP-IDF)
+>
+>
 # BPU v2.9b-r1 — Dual UART Demo (ESP32)
 
 ## Documentation
